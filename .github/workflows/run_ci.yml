@@ -1,0 +1,41 @@
+name: Build and Run Python Command
+
+on:
+  push:
+    branches:
+      - main  # or master, depending on your default branch name
+  pull_request:
+    types: [closed]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+
+    - name: Build repository
+      run: |
+        pip install acryl-datahub
+
+    - name: Set up .datahubenv file
+      run: |
+        echo "gms:" > ~/.datahubenv
+        echo "  server: ${{ secrets.DATAHUB_GMS }}" >> ~/.datahubenv
+        echo "  token: ${{ secrets.DATAHUB_PAT }}" >> ~/.datahubenv
+      shell: bash
+
+    - name: Run Python command
+      run: |
+        datahub ingest -c recipe.yaml
