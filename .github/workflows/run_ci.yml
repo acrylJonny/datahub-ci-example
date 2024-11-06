@@ -1,4 +1,4 @@
-name: Build and Run Python Command
+name: Run Datahub CLI Ingestion
 
 on:
   push:
